@@ -1,0 +1,13 @@
+Top 5 Nodes by Degree Centrality:
+Node 1072: 0.0253
+Node 363: 0.0129
+Node 35661: 0.0099
+Node 106: 0.0092
+Node 482709: 0.0086
+
+Top 5 Nodes by Betweenness Centrality:
+Node 1072: 0.2389
+Node 363: 0.1354
+Node 106: 0.0337
+Node 482709: 0.0330
+Node 663931: 0.0245
