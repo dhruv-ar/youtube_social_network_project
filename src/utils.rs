@@ -1,13 +1,25 @@
 use csv::Writer;
 use std::collections::HashMap;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::Write;
 use plotters::prelude::*;
 
-pub fn save_centrality(file_path: &str, centrality: &HashMap<u32, f64>) {
-    let mut writer = Writer::from_path(file_path).expect("Failed to create output file");
+/// Ensure the `output/` directory exists
+pub fn ensure_output_dir_exists() {
+    let output_dir = "output";
+    if !fs::metadata(output_dir).is_ok() {
+        fs::create_dir(output_dir).expect("Failed to create output directory");
+    }
+}
 
-    writer.write_record(&["Node", "Centrality"]).expect("Failed to write header");
+pub fn save_centrality(file_name: &str, centrality: &HashMap<u32, f64>) {
+    ensure_output_dir_exists(); // Ensure the directory exists
+    let file_path = format!("output/{}", file_name);
+    let mut writer = Writer::from_path(&file_path).expect("Failed to create output file");
+
+    writer
+        .write_record(&["Node", "Centrality"])
+        .expect("Failed to write header");
 
     for (node, value) in centrality {
         writer
@@ -17,8 +29,10 @@ pub fn save_centrality(file_path: &str, centrality: &HashMap<u32, f64>) {
     println!("Centrality data saved to '{}'.", file_path);
 }
 
-pub fn save_degree_distribution(file_path: &str, degree_distribution: &HashMap<usize, usize>) {
-    let mut writer = Writer::from_path(file_path).expect("Failed to create output file");
+pub fn save_degree_distribution(file_name: &str, degree_distribution: &HashMap<usize, usize>) {
+    ensure_output_dir_exists(); // Ensure the directory exists
+    let file_path = format!("output/{}", file_name);
+    let mut writer = Writer::from_path(&file_path).expect("Failed to create output file");
 
     writer
         .write_record(&["Degree", "Count"])
@@ -32,21 +46,27 @@ pub fn save_degree_distribution(file_path: &str, degree_distribution: &HashMap<u
     println!("Degree distribution data saved to '{}'.", file_path);
 }
 
-pub fn save_communities(labels: &HashMap<u32, u32>, output_file: &str) {
+pub fn save_communities(labels: &HashMap<u32, u32>, file_name: &str) {
+    ensure_output_dir_exists(); // Ensure the directory exists
+    let file_path = format!("output/{}", file_name);
+
     let mut community_map: HashMap<u32, Vec<u32>> = HashMap::new();
     for (&node, &label) in labels {
         community_map.entry(label).or_default().push(node);
     }
 
-    let mut file = File::create(output_file).expect("Unable to create file");
+    let mut file = File::create(&file_path).expect("Unable to create file");
     for (community, members) in community_map {
         writeln!(&mut file, "Community {}: {:?}", community, members).expect("Unable to write to file");
     }
-    println!("Community detection results saved to '{}'.", output_file);
+    println!("Community detection results saved to '{}'.", file_path);
 }
 
-pub fn plot_degree_distribution(file_path: &str, degree_distribution: &HashMap<usize, usize>) {
-    let root = BitMapBackend::new(file_path, (1024, 768))
+pub fn plot_degree_distribution(file_name: &str, degree_distribution: &HashMap<usize, usize>) {
+    ensure_output_dir_exists(); // Ensure the directory exists
+    let file_path = format!("output/{}", file_name);
+
+    let root = BitMapBackend::new(&file_path, (1024, 768))
         .into_drawing_area();
     root.fill(&WHITE).expect("Failed to fill background");
 
@@ -69,9 +89,8 @@ pub fn plot_degree_distribution(file_path: &str, degree_distribution: &HashMap<u
 
     let data: Vec<(usize, usize)> = degree_distribution.iter().map(|(&k, &v)| (k, v)).collect();
 
-    chart.draw_series(
-        data.iter()
-            .map(|&(x, y)| Circle::new((x, y), 3, BLUE.filled())),
-    ).expect("Failed to draw series");
+    chart
+        .draw_series(data.iter().map(|&(x, y)| Circle::new((x, y), 3, BLUE.filled())))
+        .expect("Failed to draw series");
     println!("Degree distribution plot saved to '{}'.", file_path);
 }

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 pub fn load_graph(file_path: &str) -> HashMap<u32, Vec<u32>> {
     let mut adjacency_list: HashMap<u32, Vec<u32>> = HashMap::new();
-
+    let file_path = "data/com-youtube.ungraph.csv";
     let mut reader = ReaderBuilder::new()
         .has_headers(false)
         .delimiter(b'\t')
