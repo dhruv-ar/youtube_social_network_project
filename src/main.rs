@@ -50,5 +50,6 @@ fn main() {
     save_centrality("closeness_centrality.csv", &closeness_centrality);
 
     let betweenness_centrality = calculate_betweenness_centrality_sampled(&adjacency_list, 500);
+    
     save_centrality("betweenness_centrality.csv", &betweenness_centrality);
 }
