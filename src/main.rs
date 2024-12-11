@@ -11,7 +11,7 @@ use crate::graph::{load_graph, get_graph_info};
 fn main() {
     println!("Loading the graph...");
 
-    // Load the graph using the `graph` module
+    
     let file_path = "data/com-youtube.ungraph.csv";
     let adjacency_list = load_graph(file_path);
 
@@ -47,8 +47,10 @@ fn main() {
     save_centrality("degree_centrality.csv", &degree_centrality);
 
     let closeness_centrality = calculate_closeness_centrality_parallel(&adjacency_list, 500);
+    
     save_centrality("closeness_centrality.csv", &closeness_centrality);
 
     let betweenness_centrality = calculate_betweenness_centrality_sampled(&adjacency_list, 500);
+
     save_centrality("betweenness_centrality.csv", &betweenness_centrality);
 }
